@@ -4,6 +4,7 @@ import model
 import tqdm
 import torch
 import scheduler
+import fadam
 
 def train(dataloader, device, hyperparameters, model):
     model.train()
@@ -12,7 +13,8 @@ def train(dataloader, device, hyperparameters, model):
 
     # criterion, optimizer, scheduler
     criterion = nn.BCEWithLogitsLoss().cuda()
-    optimizer = optim.Adam(model.parameters(), lr=hyperparameters["learning_rate"])
+    # optimizer = optim.Adam(model.parameters(), lr=hyperparameters["learning_rate"])
+    optimizer = fadam.FAdam(model.parameters())
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda epoch: 0.95 ** epoch)
     acc_list =[]
     loss_list =[]
@@ -50,6 +52,6 @@ def train(dataloader, device, hyperparameters, model):
 
 
     print("Training complete. Saving model...")
-    torch.save(model.state_dict(), f"fakaAudio-11-5.pth")
+    torch.save(model.state_dict(), f"fakaAudio-11-5-fadam.pth")
     print(f"Model saved. fakaAudio.pth")
     return {"acc": accuracy, "loss": loss}

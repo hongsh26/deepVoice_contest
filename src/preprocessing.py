@@ -8,7 +8,8 @@ from PIL import Image
 import pandas as pd
 import numpy as np
 import csv
-
+from torchvision import transforms
+import pickle
 from torch.utils.data import DataLoader, TensorDataset
 
 device = ("cuda" if torch.cuda.is_available() else "cpu")
@@ -105,9 +106,44 @@ def data_loader():
 
     return train_loader
 
+def load_test_data(file_path):
+    # test_image.pkl 파일을 로드
+    with open(file_path, 'rb') as f:
+        image_data = pickle.load(f)
 
+    images = []
+    file_names = []
+    for file_name, image_tensor in image_data.items():
+        images.append(image_tensor)
+        file_names.append(file_name)
+
+    # 텐서 데이터셋 생성
+    images_tensor = torch.stack(images)
+    dataset = TensorDataset(images_tensor, torch.tensor(range(len(images_tensor))))  # dummy targets
+    return DataLoader(dataset, batch_size=32, shuffle=False), file_names
+
+
+def preprocess_and_save_images(image_dir, output_file):
+    trans = transforms.Compose([transforms.Resize((100, 100)),
+                                transforms.ToTensor(),
+                                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+    image_data = {}
+
+    for file_name in os.listdir(image_dir):
+        print(file_name)
+        image_path = os.path.join(image_dir, file_name)
+        image = Image.open(image_path).convert('RGB')
+        image_tensor = trans(image)
+        image_data[file_name] = image_tensor
+
+    with open(output_file, 'wb') as f:
+        pickle.dump(image_data, f)
+
+
+# preprocess_and_save_images('../data/test_spectrogram', '../data/test_image.pkl')
 # train_data = pd.read_csv('../data/train.csv')
-files = os.listdir('../data/test')
+# files = os.listdir('../data/test')
 # data = load_and_label_data('../data/train_spectrogram','../data/train.csv')
 # save_csv(data)
 # count = 0
