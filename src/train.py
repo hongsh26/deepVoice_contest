@@ -52,6 +52,6 @@ def train(dataloader, device, hyperparameters, model):
 
 
     print("Training complete. Saving model...")
-    torch.save(model.state_dict(), f"fakaAudio-11-5-fadam.pth")
+    torch.save(model.state_dict(), f"fakaAudio-16-12-5-fadam.pth")
     print(f"Model saved. fakaAudio.pth")
     return {"acc": accuracy, "loss": loss}

@@ -1,6 +1,7 @@
 import torch.nn as nn
 from torch import optim
 from model import LeNet_5
+from model1 import EFNet_L2
 import tqdm
 import torch
 import scheduler
@@ -11,7 +12,8 @@ def test(test_loader, file_names):
     device = ("cuda" if torch.cuda.is_available() else "cpu")
     results = []
     model = LeNet_5()
-    model.load_state_dict(torch.load('../src/fakaAudio-11-5-fadam.pth'))
+    # model = EFNet_L2(1)
+    model.load_state_dict(torch.load('../src/fakaAudio-16-11-5-fadam.pth'))
     model = model.to(device)
     model.eval()
     with torch.no_grad():
